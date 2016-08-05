@@ -1,4 +1,4 @@
-// https://code.google.com/codejam/contest/dashboard?c=351101
+// https://code.google.com/codejam/contest/351101/dashboard
 
 #include <iostream>
 #include <sstream>
