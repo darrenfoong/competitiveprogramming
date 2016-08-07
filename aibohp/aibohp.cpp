@@ -19,18 +19,14 @@ using namespace std;
 int lcs(string u, string v);
 int solve(string u);
 
-int dp[MAX_LENGTH+1][MAX_LENGTH+1];
+int prevrow[MAX_LENGTH+1];
+int currrow[MAX_LENGTH+1];
 
 int main() {
 	ios_base::sync_with_stdio(false);
 
 	int t = 0;
 	cin >> t;
-
-	forv(i, MAX_LENGTH+1) {
-		dp[0][i] = 0;
-		dp[i][0] = 0;
-	}
 
 	forv(i,t) {
 		string u = "";
@@ -42,22 +38,28 @@ int main() {
 }
 
 int lcs(string u) {
+	forv(i, MAX_LENGTH+1) {
+		prevrow[i] = 0;
+	}
+
 	int up = 0, left = 0, diag = 0;
 	for ( int i = 1; i <= u.length(); i++ ) {
 		for ( int j = 1; j <= u.length(); j++ ) {
-			up = dp[i-1][j];
-			left = dp[i][j-1];
-			diag = dp[i-1][j-1];
+			up = prevrow[j];
+			left = currrow[j-1];
+			diag = prevrow[j-1];
 
 			if ( u[i-1] == u[u.length()-j] ) {
 				diag++;
 			}
 
-			dp[i][j] = max(up, max(left, diag));
+			currrow[j] = max(up, max(left, diag));
 		}
+
+		copy(begin(currrow), end(currrow), begin(prevrow));
 	}
 
-	return dp[u.length()][u.length()];
+	return currrow[u.length()];
 }
 
 int solve(string u) {
