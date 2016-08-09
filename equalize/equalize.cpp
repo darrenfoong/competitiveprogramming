@@ -11,16 +11,80 @@
 #define setpii set<pair<int, int> >
 #define mseti multiset<int>
 #define msetl multiset<long>
+#define msetlr multiset<long, greater<int> >
+#define pqi priority_queue<int>
+#define pqir priority_queue<int, vector<int>, greater<int> >
 #define pqpii priority_queue<pair<int, int> >
-#define pqpiir priority_queue<pair<int, int>, vector<pair<int, int> >, greater<pii> >
+#define pqpiir priority_queue<pair<int, int>, vector<pair<int, int> >, greater<pair<int, int> > >
 #define forv(i,n) for ( int i = 0; i < n; i++ )
 #define all(x) x.begin(), x.end()
 #define nl "\n"
 
 using namespace std;
 
-long initMedian(vvl &grid, int k, int l, int row, msetl &kernel);
-long nextMedian(vvl &grid, int k, int l, int row, int col, msetl &kernel);
+class MedianHeap {
+	int halfsize;
+	msetl lowerValues;
+	msetl upperValues;
+
+	public:
+	void init(msetl &values) {
+		lowerValues.clear();
+		upperValues.clear();
+
+		auto it = values.begin();
+		halfsize = (values.size()-1)/2;
+		// assume odd number of values
+
+		forv(i,halfsize + 1) {
+			lowerValues.insert(*it);
+			it++;
+		}
+
+		forv(i,halfsize) {
+			upperValues.insert(*it);
+			it++;
+		}
+	}
+
+	long getMedian() {
+		auto rit = lowerValues.rbegin();
+		return *rit;
+	}
+
+	void inout(long inValue, long outValue) {
+		if ( inValue == outValue ) {
+			return;
+		}
+
+		long median = getMedian();
+
+		if ( outValue <= median ) {
+			lowerValues.erase(lowerValues.find(outValue));
+		} else {
+			upperValues.erase(upperValues.find(outValue));
+		}
+
+		if ( inValue <= median ) {
+			lowerValues.insert(inValue);
+		} else {
+			upperValues.insert(inValue);
+			auto upperFirst = upperValues.begin();
+			lowerValues.insert(*upperFirst);
+			upperValues.erase(upperFirst);
+		}
+
+		if ( upperValues.size() < halfsize ) {
+			auto lowerLast = lowerValues.end();
+			lowerLast--;
+			upperValues.insert(*lowerLast);
+			lowerValues.erase(lowerLast);
+		}
+	}
+};
+
+long initMedian(vvl &grid, int k, int l, int row, MedianHeap &kernel);
+long nextMedian(vvl &grid, int k, int l, int row, int col, MedianHeap &kernel);
 long solve(vvl &grid, int k, int l);
 
 int main() {
@@ -47,35 +111,28 @@ int main() {
 	return 0;
 }
 
-long initMedian(vvl &grid, int k, int l, int row, msetl &kernel) {
-	kernel.clear();
-
+long initMedian(vvl &grid, int k, int l, int row, MedianHeap &kernel) {
+	msetl values;
 	forv(i,k) {
 		forv(j,l) {
-			kernel.insert(grid[i+row][j]);
+			values.insert(grid[i+row][j]);
 		}
 	}
 
-	auto it = kernel.begin();
-	advance(it, (kernel.size()-1)/2);
-
-	return *it;
+	kernel.init(values);
+	return kernel.getMedian();
 }
 
-long nextMedian(vvl &grid, int k, int l, int row, int col, msetl &kernel) {
+long nextMedian(vvl &grid, int k, int l, int row, int col, MedianHeap &kernel) {
 	long todel = 0, toadd = 0;
 
 	forv(i,k) {
 		todel = grid[i+row][col-1];
-		kernel.erase(kernel.find(todel));
 		toadd = grid[i+row][col+l-1];
-		kernel.insert(toadd);
+		kernel.inout(toadd, todel);
 	}
 
-	auto it = kernel.begin();
-	advance(it, (kernel.size()-1)/2);
-
-	return *it;
+	return kernel.getMedian();
 }
 
 long solve(vvl &grid, int k, int l) {
@@ -83,7 +140,7 @@ long solve(vvl &grid, int k, int l) {
 	int m = grid[0].size();
 
 	long maxMedian = 0, newMedian = 0;
-	msetl kernel;
+	MedianHeap kernel;
 
 	forv(i, n-k+1) {
 		newMedian = initMedian(grid, k, l, i, kernel);
