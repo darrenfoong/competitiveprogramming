@@ -43,9 +43,9 @@ using namespace std;
 typedef unordered_map<char, vector<int> > charindex;
 typedef unordered_map<string, charindex> charindexes;
 
-string stolower(string input);
-bool checkMatch(string input, string ref, charindex &lookup);
-string solve(string input, vs &dict, charindexes &lookups);
+void stolower(string &input);
+bool checkMatch(const string &input, charindex &lookup);
+string solve(const string &input, vs &dict, charindexes &lookups);
 
 int main() {
 	ios_base::sync_with_stdio(false);
@@ -61,20 +61,25 @@ int main() {
 
 	forv(i,n) {
 		cin >> s;
-		dict.pb(s);
+		dict.emplace_back(s);
 
 		charindex lookup;
+		set<char> uniqueChars;
 
 		forv(j, s.length()) {
 			char currentChar = s[j];
+			uniqueChars.insert(currentChar);
 
 			if ( lookup.count(currentChar) == 0 ) {
 				vi indices;
 				lookup[currentChar] = indices;
 			}
 
-			lookup[currentChar].pb(j);
-			sort(all(lookup[currentChar]));
+			lookup[currentChar].emplace_back(j);
+		}
+
+		for ( auto lit = uniqueChars.begin(); lit != uniqueChars.end(); lit++ ) {
+			sort(all(lookup[*lit]));
 		}
 
 		lookups[s] = lookup;
@@ -82,55 +87,68 @@ int main() {
 
 	forv(i,m) {
 		cin >> s;
-		cout << solve(stolower(s), dict, lookups) << nl;
+		stolower(s);
+		cout << solve(s, dict, lookups) << nl;
 	}
 
 	return 0;
 }
 
-string stolower(string input) {
-	string res = "";
-
+void stolower(string &input) {
 	forv(i, input.length()) {
-		res += tolower(input[i]);
+		input[i] = tolower(input[i]);
 	}
-
-	return res;
 }
 
-bool checkMatch(string input, string ref, charindex &lookup) {
-	int tracker = input.length();
+bool checkMatch(const string &input, charindex &lookup) {
 	int lastPos = -1;
+
+	// quick reject
+	forv(i, input.length()) {
+		char currentChar = input[i];
+
+		if ( lookup.count(currentChar) == 0 ) {
+			return false;
+		}
+	}
 
 	forv(i, input.length()) {
 		bool found = false;
 		char currentChar = input[i];
 
-		if ( lookup.count(currentChar) == 0 ) {
+		vi indices = lookup[currentChar];
+		int minIndex = indices[0];
+		int maxIndex = indices[indices.size()-1];
+
+		if ( maxIndex < lastPos ) {
 			return false;
+		}
+
+		if ( minIndex > lastPos ) {
+			lastPos = minIndex;
+			found = true;
 		} else {
-			vi indices = lookup[currentChar];
+			auto ubound = upper_bound(all(indices), lastPos);
 
-			forv(j, indices.size()) {
-				if ( indices[j] > lastPos ) {
-					lastPos = indices[j];
-					found = true;
-					break;
-				}
-			}
-
-			if ( !found ) {
+			if ( ubound == indices.end() ) {
 				return false;
+			} else {
+				lastPos = *ubound;
+				found = true;
 			}
+		}
+
+		if ( !found ) {
+			return false;
 		}
 	}
 
 	return true;
 }
 
-string solve(string input, vs &dict, charindexes &lookups) {
+string solve(const string &input, vs &dict, charindexes &lookups) {
 	for ( auto dit = dict.begin(); dit != dict.end(); dit++ ) {
-		if ( checkMatch(input, *dit, lookups[*dit]) ) {
+		if ( checkMatch(input, lookups[*dit]) ) {
 			return *dit;
 		}
 	}
