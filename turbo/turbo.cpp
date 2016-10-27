@@ -43,7 +43,14 @@
 
 using namespace std;
 
-void solve(li &xs, umapp &ptrs);
+int indices[LIMIT];
+umapp ptrs;
+li xs;
+seti sorted;
+
+void solve(int n);
+int num_lte(int x);
+int num_gte(int x);
 
 int main() {
     ios_base::sync_with_stdio(false);
@@ -54,45 +61,74 @@ int main() {
 
     cin >> n;
 
-    li xs;
-    umapp ptrs;
-
     forv(i,n) {
         cin >> x;
-        xs.pb(x-1);
+
+        indices[x-1] = i;
+        xs.push_back(x-1);
         ptrs.emplace(x-1,prev(xs.end()));
     }
 
-    solve(xs, ptrs);
+    solve(n);
 
     return 0;
 }
 
-void solve(li &xs, umapp &ptrs) {
-    int n = xs.size();
+void solve(int n) {
     int src = 0;
     int dest = 0;
+    int nsorted_src = 0;
+    int nsorted_dest = 0;
 
     int cmin = 0;
     int cmax = n-1;
-
-    li::iterator srcptr;
+    int cnum = 0;
 
     forv(i,n) {
+        cout << "i is " << i << nl;
         if ( i % 2 == 0 ) {
+            cnum = i/2;
             // i is even: find smallest element
-            srcptr = ptrs[cmin++];
-            dest = 0;
+            src = indices[cmin];
+            dest = indices[*(xs.begin())];
+
+            cmin++;
+
+            nsorted_src = num_lte(src);
+            nsorted_dest = num_lte(dest);
         } else {
+            cnum = n-((i+1)/2);
             // i is odd: find largest element
-            srcptr = ptrs[cmax--];
-            dest = xs.size()-1;
+            src = indices[cmax];
+            dest = indices[*(prev(xs.end()))];
+
+            cmax--;
+
+            nsorted_src = num_gte(src);
+            nsorted_dest = num_gte(dest);
         }
 
-        src = distance(xs.begin(), srcptr);
+        cout << " cnum is " << cnum << nl;
+        cout << " src is " << src << nl;
+        cout << " dest is " << dest << nl;
+        cout << " nsorted_src is " << nsorted_src << nl;
+        cout << " nsorted_dest is " << nsorted_dest << nl;
+        cout << " emplace " << src << nl;
 
-        cout << abs(dest-src) << nl;
+        cout << abs(dest-src) - (nsorted_src-nsorted_dest) << nl;
 
-        xs.erase(srcptr);
+        sorted.emplace(src);
+
+        xs.erase(ptrs[cnum]);
     }
+}
+
+int num_lte(int x) {
+    auto lb = upper_bound(all(sorted), x);
+    return distance(sorted.begin(), lb);
+}
+
+int num_gte(int x) {
+    auto lb = lower_bound(all(sorted), x);
+    return distance(lb, sorted.end());
 }
