@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 
+#define uint unsigned int
 #define pii pair<int, int>
 #define vi vector<int>
 #define vl vector<long>
@@ -34,68 +35,114 @@
 
 #ifdef DEBUG
  #define db(x) x
+ #define io_opts
 #else
  #define db(x)
+ #define io_opts ios_base::sync_with_stdio(false); cin.tie(NULL);
 #endif
 
 #define LIMIT 100000
 
 using namespace std;
 
-int indices[LIMIT];
-int offsets[LIMIT];
+class FenwickTree {
+    public:
+    void add(uint index, int v) {
+        for ( uint i = index; i < n; i += (-i) & i ) {
+            nodes[i] += v;
+        }
+    }
 
-void solve(int n);
-int get_offset(int n);
+    int get(uint index) {
+        /*
+         * In a normal Fenwick tree, this should return the sum up to
+         * index inclusive. However, since the previous version's
+         * get_offset() method returns the sum up to index exclusive,
+         * this method follows the same specifications.
+         */
+        index--;
+
+        int res = 0;
+
+        for ( uint i = index; i > 0; i -= (-i) & i ) {
+            res += nodes[i];
+        }
+
+        return res;
+    }
+
+    void dump() {
+        for ( uint i = 1; i < n; i++ ) {
+            cout << "(" << i << " : " << get(i) << ")" << nl;
+        }
+    }
+
+    FenwickTree(uint size) {
+        n = size + 1;
+
+        for ( uint i = 1; i < n; i++ ) {
+            nodes[i] = 0;
+        }
+    }
+
+    private:
+    uint n;
+    int nodes[LIMIT+1];
+};
+
+uint indices[LIMIT+1];
+
+void solve(uint n, FenwickTree &offsets);
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    io_opts
 
-    int n = 0;
+    uint n = 0;
     int x = 0;
 
     cin >> n;
 
-    forv(i,n) {
+    FenwickTree offsets(n);
+
+    for ( uint i = 1; i <= n; i++ ) {
         cin >> x;
 
-        indices[x-1] = i;
-        offsets[i] = 0;
+        indices[x] = i;
+        offsets.add(i, 0);
     }
 
-    solve(n);
+    solve(n, offsets);
 
     return 0;
 }
 
-void solve(int n) {
+void solve(uint n, FenwickTree &offsets) {
     int src = 0;
     int dest = 0;
 
-    int cmin = 0;
-    int cmax = n-1;
-    int cnum = 0;
+    uint cmin = 1;
+    uint cmax = n;
+    db(uint cnum = 0;)
 
-    forv(i,n) {
+    for ( uint i = 0; i < n; i++ ) {
         db(cout << "i is " << i << nl;)
 
         if ( i % 2 == 0 ) {
             // i is even: find smallest element
-            cnum = i/2;
-            dest = get_offset(0);
+            db(cnum = i/2 + 1;)
+            dest = 1;
             src = indices[cmin++];
-            offsets[src]--;
-            src += get_offset(src);
+            offsets.add(src, -1);
+            src += offsets.get(src);
 
             cout << src - dest << nl;
         } else {
             // i is odd: find largest element
-            cnum = n-((i+1)/2);
-            dest = (n-1) + get_offset(n);
+            db(cnum = n-((i-1)/2);)
+            dest = n - i;
             src = indices[cmax--];
-            offsets[src]--;
-            src += get_offset(src);
+            offsets.add(src, -1);
+            src += offsets.get(src);
 
             cout << dest - src << nl;
         }
@@ -106,14 +153,4 @@ void solve(int n) {
             cout << " dest is " << dest << nl;
         )
     }
-}
-
-int get_offset(int n) {
-    int offset = 0;
-
-    forv(i,n) {
-        offset += offsets[i];
-    }
-
-    return offset;
 }
