@@ -30,7 +30,7 @@
 #define pb push_back
 #define nl "\n"
 
-#define DEBUG
+#define NODEBUG
 
 #ifdef DEBUG
  #define db(x) x
@@ -39,18 +39,14 @@
 #endif
 
 #define LIMIT 100000
-#define umapp unordered_map<int,li::iterator>
 
 using namespace std;
 
 int indices[LIMIT];
-umapp ptrs;
-li xs;
-seti sorted;
+int offsets[LIMIT];
 
 void solve(int n);
-int num_lte(int x);
-int num_gte(int x);
+int get_offset(int n);
 
 int main() {
     ios_base::sync_with_stdio(false);
@@ -65,8 +61,7 @@ int main() {
         cin >> x;
 
         indices[x-1] = i;
-        xs.push_back(x-1);
-        ptrs.emplace(x-1,prev(xs.end()));
+        offsets[i] = 0;
     }
 
     solve(n);
@@ -77,58 +72,48 @@ int main() {
 void solve(int n) {
     int src = 0;
     int dest = 0;
-    int nsorted_src = 0;
-    int nsorted_dest = 0;
 
     int cmin = 0;
     int cmax = n-1;
     int cnum = 0;
 
     forv(i,n) {
-        cout << "i is " << i << nl;
+        db(cout << "i is " << i << nl;)
+
         if ( i % 2 == 0 ) {
-            cnum = i/2;
             // i is even: find smallest element
-            src = indices[cmin];
-            dest = indices[*(xs.begin())];
+            cnum = i/2;
+            dest = get_offset(0);
+            src = indices[cmin++];
+            offsets[src]--;
+            src += get_offset(src);
 
-            cmin++;
-
-            nsorted_src = num_lte(src);
-            nsorted_dest = num_lte(dest);
+            cout << src - dest << nl;
         } else {
-            cnum = n-((i+1)/2);
             // i is odd: find largest element
-            src = indices[cmax];
-            dest = indices[*(prev(xs.end()))];
+            cnum = n-((i+1)/2);
+            dest = (n-1) + get_offset(n);
+            src = indices[cmax--];
+            offsets[src]--;
+            src += get_offset(src);
 
-            cmax--;
-
-            nsorted_src = num_gte(src);
-            nsorted_dest = num_gte(dest);
+            cout << dest - src << nl;
         }
 
-        cout << " cnum is " << cnum << nl;
-        cout << " src is " << src << nl;
-        cout << " dest is " << dest << nl;
-        cout << " nsorted_src is " << nsorted_src << nl;
-        cout << " nsorted_dest is " << nsorted_dest << nl;
-        cout << " emplace " << src << nl;
-
-        cout << abs(dest-src) - (nsorted_src-nsorted_dest) << nl;
-
-        sorted.emplace(src);
-
-        xs.erase(ptrs[cnum]);
+        db(
+            cout << " cnum is " << cnum << nl;
+            cout << " src is " << src << nl;
+            cout << " dest is " << dest << nl;
+        )
     }
 }
 
-int num_lte(int x) {
-    auto lb = upper_bound(all(sorted), x);
-    return distance(sorted.begin(), lb);
-}
+int get_offset(int n) {
+    int offset = 0;
 
-int num_gte(int x) {
-    auto lb = lower_bound(all(sorted), x);
-    return distance(lb, sorted.end());
+    forv(i,n) {
+        offset += offsets[i];
+    }
+
+    return offset;
 }
