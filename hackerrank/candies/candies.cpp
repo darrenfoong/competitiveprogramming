@@ -81,8 +81,8 @@ int main() {
       } else {
         // need to "backtrack"
         dpsum[i] = dpsum[i-1];
-        for (int j = i; scores[j] < scores[j-1]; j--) {
-          dp[i][i]++;
+        for (int j = i; j == 0 || (j > 0 && scores[j] < scores[j-1]); j--) {
+          dp[i][j]++;
           dpsum[i]++;
         }
       }
