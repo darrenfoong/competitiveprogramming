@@ -50,7 +50,7 @@ int main() {
 
   cin >> size >> numQueries;
 
-  long arr[size+2] = {};
+  long *arr = new long[size+2]();
   int left, right;
   long summand;
 
