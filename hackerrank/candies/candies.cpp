@@ -51,38 +51,37 @@ int main() {
   cin >> n;
 
   int scores[n];
-  int **dp = new int*[n]; // dp[i] is the ith state of the candy distribution
 
   forv(i,n) {
     cin >> scores[i];
-    dp[i] = new int[n];
   }
 
+  long dplast[n] = {};
   long dpsum[n] = {};
 
-  dp[0][0] = 1;
+  dplast[0] = 1;;
   dpsum[0] = 1;
 
   for (int i = 1; i < n; i++) {
     if (scores[i] > scores[i-1]) {
-      dp[i][i] = dp[i-1][i-1] + 1;
-      dpsum[i] = dpsum[i-1] + dp[i][i];
+      dplast[i] = dplast[i-1] + 1;
+      dpsum[i] = dpsum[i-1] + dplast[i];
     }
 
     if (scores[i] == scores[i-1]) {
-      dp[i][i] = 1;
-      dpsum[i] = dpsum[i-1] + dp[i][i];
+      dplast[i] = 1;
+      dpsum[i] = dpsum[i-1] + dplast[i];
     }
 
     if (scores[i] < scores[i-1]) {
-      if (dp[i-1][i-1] > 1) {
-        dp[i][i] = 1;
-        dpsum[i] = dpsum[i-1] + dp[i][i];
+      if (dplast[i-1] > 1) {
+        dplast[i] = 1;
+        dpsum[i] = dpsum[i-1] + dplast[i];
       } else {
         // need to "backtrack"
         dpsum[i] = dpsum[i-1];
+        dplast[i]++;
         for (int j = i; j == 0 || (j > 0 && scores[j] < scores[j-1]); j--) {
-          dp[i][j]++;
           dpsum[i]++;
         }
       }
