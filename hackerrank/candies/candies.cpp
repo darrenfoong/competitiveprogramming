@@ -64,12 +64,8 @@ int main() {
   dpsum[0] = 1;
 
   for (int i = 1; i < n; i++) {
-    for (int j = 0; j < i; j++) {
-      dp[i][j] = dp[i-1][j];
-    }
-
     if (scores[i] > scores[i-1]) {
-      dp[i][i] = dp[i][i-1] + 1;
+      dp[i][i] = dp[i-1][i-1] + 1;
       dpsum[i] = dpsum[i-1] + dp[i][i];
     }
 
@@ -86,7 +82,7 @@ int main() {
         // need to "backtrack"
         dpsum[i] = dpsum[i-1];
         for (int j = i; scores[j] < scores[j-1]; j--) {
-          dp[i][j] += 1;
+          dp[i][i]++;
           dpsum[i]++;
         }
       }
