@@ -48,25 +48,27 @@ int main() {
 
   int size, numQueries;
 
-  cin >> size;
-  cin >> numQueries;
+  cin >> size >> numQueries;
 
-  int arr[size+1] = {};
-  int left;
-  int right;
-  int summand;
+  long arr[size+2] = {};
+  int left, right;
+  long summand;
 
   forv(i,numQueries) {
-    cin >> left;
-    cin >> right;
-    cin >> summand;
+    cin >> left >> right >> summand;
 
-    for ( int i = left; i <= right; i++ ) {
-      arr[i] += summand;
-    }
+    arr[left] += summand;
+    arr[right+1] -= summand;
   }
 
-  cout << *max_element(arr, arr+size+1);
+  long x = 0, max = 0;
+
+  forv1(i,size) {
+    x += arr[i];
+    if (x > max) max = x;
+  }
+
+  cout << max;
 
   return 0;
 }
