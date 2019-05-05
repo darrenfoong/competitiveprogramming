@@ -83,7 +83,6 @@ int main() {
         dpsum[i] = dpsum[i-1] + dp[i][i];
       } else {
         // need to "backtrack"
-        cout << "Backtracking" << nl;
         dpsum[i] = dpsum[i-1];
         for (int j = i; scores[j] < scores[j-1]; j--) {
           dp[i][j] += 1;
