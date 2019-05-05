@@ -51,13 +51,14 @@ int main() {
   cin >> n;
 
   int scores[n];
+  int **dp = new int*[n]; // dp[i] is the ith state of the candy distribution
 
   forv(i,n) {
     cin >> scores[i];
+    dp[i] = new int[n];
   }
 
-  int dp[n][n] = {}; // dp[i] is the ith state of the candy distribution
-  int dpsum[n] = {};
+  long dpsum[n] = {};
 
   dp[0][0] = 1;
   dpsum[0] = 1;
