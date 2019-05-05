@@ -46,15 +46,15 @@ using namespace std;
 void solve(uint n);
 
 int main() {
-    io_opts
+  io_opts
 
-    uint n = 0;
+  uint n = 0;
 
-    cin >> n;
+  cin >> n;
 
-    solve(n);
+  solve(n);
 
-    return 0;
+  return 0;
 }
 
 void solve(uint n) {
