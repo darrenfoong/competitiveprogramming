@@ -91,6 +91,10 @@ int main() {
 }
 
 pii dp(int n, int c, double maxValue, vi &values, vi &costs, unordered_map<pii, pii, pair_hash> &memo) {
+  if (c <= 0) {
+    return pii(INT_MIN, 0);
+  }
+
   pii nc = pii(n,c);
 
   if (memo.find(nc) != memo.end()) {
@@ -98,12 +102,6 @@ pii dp(int n, int c, double maxValue, vi &values, vi &costs, unordered_map<pii, 
   }
 
   pii res;
-
-  if (c <= 0) {
-    res = pii(INT_MIN, 0);
-    memo[nc] = res;
-    return res;
-  }
 
   if (n == 0) {
     if (values[0] <= maxValue && costs[0] <= c) {
