@@ -73,7 +73,9 @@ int main() {
        costs.pb(cost);
      }
 
-     cout << dp(n, c, pow(2, ((75-n)/(double) 2)), values, costs).second << nl;
+     pii res = dp(n, c, pow(2, ((75-n)/(double) 2)), values, costs);
+
+     cout << res.first << " " << res.second << nl;
   }
 
   return 0;
@@ -81,11 +83,11 @@ int main() {
 
 pii dp(int n, int c, double maxValue, vi &values, vi &costs) {
   if (c <= 0) {
-    return pii(0, 0);
+    return pii(INT_MIN, 0);
   }
 
   if (n == 0) {
-    if (values[0] < maxValue && costs[0] < c) {
+    if (values[0] <= maxValue && costs[0] <= c) {
       return pii(values[0], costs[0]);
     } else {
       return pii(0, 0);
