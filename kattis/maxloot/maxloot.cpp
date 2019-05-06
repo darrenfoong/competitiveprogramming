@@ -55,7 +55,6 @@ int main() {
     int cost = 0;
 
     cin >> t;
-    cin.ignore();
 
     forv1(i,t){
         cin >> n;
@@ -64,21 +63,15 @@ int main() {
         vi values;
         vi costs;
 
-        cin.ignore();
-
         forv(j,n) {
             cin >> value;
             values.pb(value);
         }
 
-        cin.ignore();
-
         forv(j,n) {
             cin >> cost;
             costs.pb(cost);
         }
-
-        cin.ignore();
 
         cout << solve(n, c, values, costs) << nl;
     }
