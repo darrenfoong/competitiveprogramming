@@ -43,7 +43,7 @@
 
 using namespace std;
 
-pii dp(int n, int c, double maxValue, vi &values, vi &costs);
+pii dp(int n, int c, double maxValue, vi &values, vi &costs, map<pii, pii> &memo);
 
 int main() {
   io_opts
@@ -73,7 +73,9 @@ int main() {
        costs.pb(cost);
      }
 
-     pii res = dp(n, c, pow(2, ((75-n)/(double) 2)), values, costs);
+     map<pii, pii> memo;
+
+     pii res = dp(n, c, pow(2, ((75-n)/(double) 2)), values, costs, memo);
 
      cout << res.first << nl;
   }
@@ -81,31 +83,46 @@ int main() {
   return 0;
 }
 
-pii dp(int n, int c, double maxValue, vi &values, vi &costs) {
+pii dp(int n, int c, double maxValue, vi &values, vi &costs, map<pii, pii> &memo) {
+  pii nc = pii(n,c);
+
+  if (memo.find(nc) != memo.end()) {
+    return memo[nc];
+  }
+
+  pii res;
+
   if (c <= 0) {
-    return pii(INT_MIN, 0);
+    res = pii(INT_MIN, 0);
+    memo[nc] = res;
+    return res;
   }
 
   if (n == 0) {
     if (values[0] <= maxValue && costs[0] <= c) {
-      return pii(values[0], costs[0]);
+      res = pii(values[0], costs[0]);
     } else {
-      return pii(0, 0);
+      res = pii(0, 0);
     }
+    memo[nc] = res;
+    return res;
   }
 
-  pii pickedResult = dp(n-1, c-costs[n], maxValue, values, costs);
-  pii unpickedResult = dp(n-1, c, maxValue, values, costs);
+  pii pickedResult = dp(n-1, c-costs[n], maxValue, values, costs, memo);
+  pii unpickedResult = dp(n-1, c, maxValue, values, costs, memo);
 
   pickedResult = pii(pickedResult.first + values[n], pickedResult.second + costs[n]);
 
   if (pickedResult.first > maxValue) {
-    return unpickedResult;
+    res = unpickedResult;
   } else {
     if (pickedResult.first > unpickedResult.first) {
-      return pickedResult;
+      res = pickedResult;
     } else {
-      return unpickedResult;
+      res = unpickedResult;
     }
   }
+
+  memo[nc] = res;
+  return res;
 }
