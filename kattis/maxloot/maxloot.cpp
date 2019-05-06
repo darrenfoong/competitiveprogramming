@@ -46,56 +46,56 @@ using namespace std;
 int solve(int n, int c, vi &values, vi &costs);
 
 int main() {
-    io_opts
+  io_opts
 
-    int t = 0;
-    int n = 0;
-    int c = 0;
-    int value = 0;
-    int cost = 0;
+   int t = 0;
+   int n = 0;
+   int c = 0;
+   int value = 0;
+   int cost = 0;
 
-    cin >> t;
+   cin >> t;
 
-    forv1(i,t){
-        cin >> n;
-        cin >> c;
+   forv1(i,t){
+     cin >> n;
+     cin >> c;
 
-        vi values;
-        vi costs;
+     vi values;
+     vi costs;
 
-        forv(j,n) {
-            cin >> value;
-            values.pb(value);
-        }
+     forv(j,n) {
+       cin >> value;
+       values.pb(value);
+      }
 
-        forv(j,n) {
-            cin >> cost;
-            costs.pb(cost);
-        }
+     forv(j,n) {
+       cin >> cost;
+       costs.pb(cost);
+     }
 
-        cout << solve(n, c, values, costs) << nl;
-    }
+     cout << solve(n, c, values, costs) << nl;
+  }
 
-    return 0;
+  return 0;
 }
 
 int solve(int n, int c, vi &values, vi &costs) {
-    int dp[n][c+1];
-    memset(dp, 0, sizeof(dp[0][0]) * n * (c+1));
+  int dp[n][c+1];
+  memset(dp, 0, sizeof(dp[0][0]) * n * (c+1));
 
-    for ( int j = 1; j < c+1; j++ ) {
-        if ( costs[0] < c ) {
-            dp[0][j] = values[0];
-        }
+  for ( int j = 1; j < c+1; j++ ) {
+    if ( costs[0] < c ) {
+      dp[0][j] = values[0];
     }
+  }
 
-    for ( int i = 1; i < n; i++ ) {
-        for ( int j = 0; j < c+1; j++ ) {
-            int pickValue = (j >= costs[i]) ? dp[i-1][j - costs[i]] + values[i] : 0;
-            int noPickValue = dp[i-1][j];
-            dp[i][j] = max(pickValue, noPickValue);
-        }
+  for ( int i = 1; i < n; i++ ) {
+    for ( int j = 0; j < c+1; j++ ) {
+      int pickValue = (j >= costs[i]) ? dp[i-1][j - costs[i]] + values[i] : 0;
+      int noPickValue = dp[i-1][j];
+      dp[i][j] = max(pickValue, noPickValue);
     }
+  }
 
-    return dp[n-1][c];
+  return dp[n-1][c];
 }
