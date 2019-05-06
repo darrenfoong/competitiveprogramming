@@ -43,7 +43,7 @@
 
 using namespace std;
 
-int solve(int n, int c, vi &values, vi &costs);
+pii dp(int n, int c, double maxValue, vi &values, vi &costs);
 
 int main() {
   io_opts
@@ -73,29 +73,37 @@ int main() {
        costs.pb(cost);
      }
 
-     cout << solve(n, c, values, costs) << nl;
+     cout << dp(n, c, pow(2, ((75-n)/(double) 2)), values, costs).second << nl;
   }
 
   return 0;
 }
 
-int solve(int n, int c, vi &values, vi &costs) {
-  int dp[n][c+1];
-  memset(dp, 0, sizeof(dp[0][0]) * n * (c+1));
+pii dp(int n, int c, double maxValue, vi &values, vi &costs) {
+  if (c <= 0) {
+    return pii(0, 0);
+  }
 
-  for ( int j = 1; j < c+1; j++ ) {
-    if ( costs[0] < c ) {
-      dp[0][j] = values[0];
+  if (n == 0) {
+    if (values[0] < maxValue && costs[0] < c) {
+      return pii(values[0], costs[0]);
+    } else {
+      return pii(0, 0);
     }
   }
 
-  for ( int i = 1; i < n; i++ ) {
-    for ( int j = 0; j < c+1; j++ ) {
-      int pickValue = (j >= costs[i]) ? dp[i-1][j - costs[i]] + values[i] : 0;
-      int noPickValue = dp[i-1][j];
-      dp[i][j] = max(pickValue, noPickValue);
+  pii pickedResult = dp(n-1, c-costs[n], maxValue, values, costs);
+  pii unpickedResult = dp(n-1, c, maxValue, values, costs);
+
+  pickedResult = pii(pickedResult.first + values[n], pickedResult.second + costs[n]);
+
+  if (pickedResult.first > maxValue) {
+    return unpickedResult;
+  } else {
+    if (pickedResult.first > unpickedResult.first) {
+      return pickedResult;
+    } else {
+      return unpickedResult;
     }
   }
-
-  return dp[n-1][c];
 }
