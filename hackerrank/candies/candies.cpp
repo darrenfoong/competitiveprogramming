@@ -46,49 +46,42 @@ using namespace std;
 int main() {
   io_opts
 
-  int n = 0;
+  int n;
 
   cin >> n;
 
-  int scores[n];
+  int *scores = new int[n];
 
   forv(i,n) {
     cin >> scores[i];
   }
 
-  long dplast[n] = {};
-  long dpsum[n] = {};
+  long *candies = new long[n];
+  candies[0] = 1;
 
-  dplast[0] = 1;;
-  dpsum[0] = 1;
-
-  for (int i = 1; i < n; i++) {
+  forv1(i,n-1) {
     if (scores[i] > scores[i-1]) {
-      dplast[i] = dplast[i-1] + 1;
-      dpsum[i] = dpsum[i-1] + dplast[i];
+      candies[i] = candies[i-1]+1;
+    } else {
+      candies[i] = 1;
     }
+  }
 
-    if (scores[i] == scores[i-1]) {
-      dplast[i] = 1;
-      dpsum[i] = dpsum[i-1] + dplast[i];
-    }
-
-    if (scores[i] < scores[i-1]) {
-      if (dplast[i-1] > 1) {
-        dplast[i] = 1;
-        dpsum[i] = dpsum[i-1] + dplast[i];
-      } else {
-        // need to "backtrack"
-        dplast[i]++;
-        dpsum[i] = dpsum[i-1];
-        for (int j = i; j == 0 || (j > 0 && scores[j] < scores[j-1]); j--) {
-          dpsum[i]++;
-        }
+  for (int i = n-2; i >= 0; i--) {
+    if (scores[i] > scores[i+1]) {
+      if (candies[i] <= candies[i+1]) {
+        candies[i] = candies[i+1]+1;
       }
     }
   }
 
-  cout << dpsum[n-1];
+  long numCandies = 0;
+
+  forv(i,n) {
+    numCandies += candies[i];
+  }
+
+  cout << numCandies;
 
   return 0;
 }
