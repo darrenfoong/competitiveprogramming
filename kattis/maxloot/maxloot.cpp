@@ -43,7 +43,14 @@
 
 using namespace std;
 
-pii dp(int n, int c, double maxValue, vi &values, vi &costs, map<pii, pii> &memo);
+struct pair_hash {
+  template <class T1, class T2>
+  size_t operator() (const pair<T1, T2> &pair) const {
+    return hash<T1>()(pair.first) ^ hash<T2>()(pair.second);
+  }
+};
+
+pii dp(int n, int c, double maxValue, vi &values, vi &costs, unordered_map<pii, pii, pair_hash> &memo);
 
 int main() {
   io_opts
@@ -73,7 +80,7 @@ int main() {
        costs.pb(cost);
      }
 
-     map<pii, pii> memo;
+     unordered_map<pii, pii, pair_hash> memo;
 
      pii res = dp(n, c, pow(2, ((75-n)/(double) 2)), values, costs, memo);
 
@@ -83,7 +90,7 @@ int main() {
   return 0;
 }
 
-pii dp(int n, int c, double maxValue, vi &values, vi &costs, map<pii, pii> &memo) {
+pii dp(int n, int c, double maxValue, vi &values, vi &costs, unordered_map<pii, pii, pair_hash> &memo) {
   pii nc = pii(n,c);
 
   if (memo.find(nc) != memo.end()) {
