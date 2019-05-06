@@ -75,7 +75,7 @@ int main() {
 
      pii res = dp(n, c, pow(2, ((75-n)/(double) 2)), values, costs);
 
-     cout << res.first << " " << res.second << nl;
+     cout << res.first << nl;
   }
 
   return 0;
