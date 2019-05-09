@@ -87,28 +87,35 @@ int dp(int n, int c, double maxValue, vi &values, vi &costs) {
 
   forv(i,n) {
     dp[i] = umapii();
-    dp[i][0] = 0;
   }
 
   forv1(j,c) {
-    dp[0][j] = values[0] <= maxValue && j >= costs[0] && costs[0] <= c ?
-               values[0] :
-               0;
+    if (values[0] <= maxValue && j >= costs[0] && costs[0] <= c) {
+      dp[0][j] = values[0];
+    }
   }
 
   for (int i = 1; i < n; i++) {
     forv1(j,c) {
-      int pickedValue = j >= costs[i] && dp[i-1].count(j - costs[i]) ?
-                        dp[i-1][j - costs[i]] + values[i] :
-                        0;
-      int unpickedValue = dp[i-1].count(j) ?
-                          dp[i-1][j] :
-                          0;
+      int picked = j >= costs[i] ?
+                   (dp[i-1].count(j - costs[i]) ? dp[i-1][j - costs[i]] : 0) :
+                   INT_MIN;
 
-      dp[i][j] = pickedValue > maxValue ?
-                 unpickedValue :
-                 max(pickedValue, unpickedValue);
+      int pickedValue = picked + values[i];
+      int unpickedValue = dp[i-1].count(j) ? dp[i-1][j] : 0;
+
+      int value = max(pickedValue, unpickedValue);
+      if (value <= maxValue && value > 0) {
+        dp[i][j] = value;
+      }
     }
+  }
+
+  forv(i,n) {
+    forv(j,c+1) {
+      cout << (dp[i].count(j) ? dp[i][j] : 0) << " ";
+    }
+    cout << nl;
   }
 
   return dp[n-1][c];
