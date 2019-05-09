@@ -115,14 +115,5 @@ int dp(int n, int c, double maxValue, vi &values, vi &costs) {
     }
   }
 
-  /*
-  forv(i,n) {
-    forv(j,c+1) {
-      cout << (dp[i].count(j) ? dp[i][j] : 0) << " ";
-    }
-    cout << nl;
-  }
-  */
-
   return dp[n-1][c];
 }
