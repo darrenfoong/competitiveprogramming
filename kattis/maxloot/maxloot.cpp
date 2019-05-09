@@ -105,8 +105,12 @@ int dp(int n, int c, double maxValue, vi &values, vi &costs) {
       int unpickedValue = dp[i-1].count(j) ? dp[i-1][j] : 0;
 
       int value = max(pickedValue, unpickedValue);
-      if (value <= maxValue && value > 0) {
-        dp[i][j] = value;
+      if (value <= maxValue) {
+        if (value > 0) {
+          dp[i][j] = value;
+        }
+      } else {
+        break;
       }
     }
   }
