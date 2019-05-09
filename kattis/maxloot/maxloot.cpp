@@ -82,7 +82,6 @@ int main() {
 }
 
 int dp(int n, int c, double maxValue, vi &values, vi &costs) {
-  // bound by maxvalue;
   // find maximum cost of item and bound dp's width
 
   int **dp = new int*[n];
@@ -93,14 +92,16 @@ int dp(int n, int c, double maxValue, vi &values, vi &costs) {
   }
 
   forv1(j,c) {
-    dp[0][j] = values[0] <= maxValue && costs[0] <= c ?
+    dp[0][j] = values[0] <= maxValue && j >= costs[0] && costs[0] <= c ?
                values[0] :
                0;
   }
 
   for (int i = 1; i < n; i++) {
     forv1(j,c) {
-      int pickedValue = j >= costs[i] ? dp[i-1][j - costs[i]] + values[i] : 0;
+      int pickedValue = j >= costs[i] ?
+                        dp[i-1][j - costs[i]] + values[i] :
+                        0;
       int unpickedValue = dp[i-1][j];
 
       dp[i][j] = pickedValue > maxValue ?
