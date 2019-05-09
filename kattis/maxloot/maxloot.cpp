@@ -43,14 +43,7 @@
 
 using namespace std;
 
-struct pair_hash {
-  template <class T1, class T2>
-  size_t operator() (const pair<T1, T2> &pair) const {
-    return hash<T1>()(pair.first) ^ hash<T2>()(pair.second);
-  }
-};
-
-pii dp(int n, int c, double maxValue, vi &values, vi &costs, unordered_map<pii, pii, pair_hash> &memo);
+int dp(int n, int c, double maxValue, vi &values, vi &costs);
 
 int main() {
   io_opts
@@ -80,54 +73,41 @@ int main() {
        costs.pb(cost);
      }
 
-     unordered_map<pii, pii, pair_hash> memo;
+     int res = dp(n, c, pow(2, ((75-n)/(double) 2)), values, costs);
 
-     pii res = dp(n, c, pow(2, ((75-n)/(double) 2)), values, costs, memo);
-
-     cout << res.first << nl;
+     cout << res << nl;
   }
 
   return 0;
 }
 
-pii dp(int n, int c, double maxValue, vi &values, vi &costs, unordered_map<pii, pii, pair_hash> &memo) {
-  if (c <= 0) {
-    return pii(INT_MIN, 0);
+int dp(int n, int c, double maxValue, vi &values, vi &costs) {
+  // bound by maxvalue;
+  // find maximum cost of item and bound dp's width
+
+  int **dp = new int*[n];
+
+  forv(i,n) {
+    dp[i] = new int[c+1];
+    dp[i][0] = 0;
   }
 
-  pii nc = pii(n,c);
-
-  if (memo.find(nc) != memo.end()) {
-    return memo[nc];
+  forv1(j,c) {
+    dp[0][j] = values[0] <= maxValue && costs[0] <= c ?
+               values[0] :
+               0;
   }
 
-  pii res;
+  for (int i = 1; i < n; i++) {
+    forv1(j,c) {
+      int pickedValue = j >= costs[i] ? dp[i-1][j - costs[i]] + values[i] : 0;
+      int unpickedValue = dp[i-1][j];
 
-  if (n == 0) {
-    if (values[0] <= maxValue && costs[0] <= c) {
-      res = pii(values[0], costs[0]);
-    } else {
-      res = pii(0, 0);
-    }
-    memo[nc] = res;
-    return res;
-  }
-
-  pii pickedResult = dp(n-1, c-costs[n], maxValue, values, costs, memo);
-  pii unpickedResult = dp(n-1, c, maxValue, values, costs, memo);
-
-  pickedResult = pii(pickedResult.first + values[n], pickedResult.second + costs[n]);
-
-  if (pickedResult.first > maxValue) {
-    res = unpickedResult;
-  } else {
-    if (pickedResult.first > unpickedResult.first) {
-      res = pickedResult;
-    } else {
-      res = unpickedResult;
+      dp[i][j] = pickedValue > maxValue ?
+                 unpickedValue :
+                 max(pickedValue, unpickedValue);
     }
   }
 
-  memo[nc] = res;
-  return res;
+  return dp[n-1][c];
 }
