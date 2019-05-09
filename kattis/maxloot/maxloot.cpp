@@ -66,7 +66,8 @@ int main() {
      forv(j,n) {
        cin >> value;
        values.pb(value);
-      }
+     }
+
 
      forv(j,n) {
        cin >> cost;
@@ -97,7 +98,7 @@ int dp(int n, int c, double maxValue, vi &values, vi &costs) {
 
   for (int i = 1; i < n; i++) {
     forv1(j,c) {
-      int pickedValue = j >= costs[i] && dp[i-1].count(j- costs[i]) ?
+      int pickedValue = j >= costs[i] && dp[i-1].count(j - costs[i]) ?
                         dp[i-1][j - costs[i]] + values[i] :
                         0;
       int unpickedValue = dp[i-1].count(j) ?
