@@ -82,12 +82,10 @@ int main() {
 }
 
 int dp(int n, int c, double maxValue, vi &values, vi &costs) {
-  // find maximum cost of item and bound dp's width
-
-  int **dp = new int*[n];
+  unordered_map<int, umapii> dp;
 
   forv(i,n) {
-    dp[i] = new int[c+1];
+    dp[i] = umapii();
     dp[i][0] = 0;
   }
 
@@ -99,10 +97,12 @@ int dp(int n, int c, double maxValue, vi &values, vi &costs) {
 
   for (int i = 1; i < n; i++) {
     forv1(j,c) {
-      int pickedValue = j >= costs[i] ?
+      int pickedValue = j >= costs[i] && dp[i-1].count(j- costs[i]) ?
                         dp[i-1][j - costs[i]] + values[i] :
                         0;
-      int unpickedValue = dp[i-1][j];
+      int unpickedValue = dp[i-1].count(j) ?
+                          dp[i-1][j] :
+                          0;
 
       dp[i][j] = pickedValue > maxValue ?
                  unpickedValue :
