@@ -83,37 +83,28 @@ int main() {
 }
 
 int dp(int n, int c, double maxValue, vi &values, vi &costs) {
-  unordered_map<int, umapii> dp;
-
-  forv(i,n) {
-    dp[i] = umapii();
-  }
+  int *dpPrev = new int[c+1]();
+  int *dpCurrent = new int[c+1]();
+  int *temp;
 
   forv1(j,c) {
-    if (values[0] <= maxValue && j >= costs[0] && costs[0] <= c) {
-      dp[0][j] = values[0];
+    if (j >= costs[0] && costs[0] <= c) {
+      dpPrev[j] = values[0];
     }
   }
 
   for (int i = 1; i < n; i++) {
     forv1(j,c) {
-      int picked = j >= costs[i] ?
-                   (dp[i-1].count(j - costs[i]) ? dp[i-1][j - costs[i]] : 0) :
-                   INT_MIN;
+      int pickedValue = (j >= costs[i] ? dpPrev[j - costs[i]] : 0) + values[i];
+      int unpickedValue = dpPrev[j];
 
-      int pickedValue = picked + values[i];
-      int unpickedValue = dp[i-1].count(j) ? dp[i-1][j] : 0;
-
-      int value = max(pickedValue, unpickedValue);
-      if (value <= maxValue) {
-        if (value > 0) {
-          dp[i][j] = value;
-        }
-      } else {
-        break;
-      }
+      dpCurrent[j] = max(pickedValue, unpickedValue);
     }
+
+    temp = dpPrev;
+    dpPrev = dpCurrent;
+    dpCurrent = temp;
   }
 
-  return dp[n-1][c];
+  return dpCurrent[c];
 }
