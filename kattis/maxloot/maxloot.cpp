@@ -43,7 +43,7 @@
 
 using namespace std;
 
-int dp(int n, int c, double maxValue, vi &values, vi &costs);
+int dp(int n, int c, vi &values, vi &costs);
 
 int main() {
   io_opts
@@ -74,7 +74,7 @@ int main() {
        costs.pb(cost);
      }
 
-     int res = dp(n, c, pow(2, ((75-n)/(double) 2)), values, costs);
+     int res = dp(n, c, values, costs);
 
      cout << res << nl;
   }
@@ -82,7 +82,7 @@ int main() {
   return 0;
 }
 
-int dp(int n, int c, double maxValue, vi &values, vi &costs) {
+int dp(int n, int c, vi &values, vi &costs) {
   int *dpPrev = new int[c+1]();
   int *dpCurrent = new int[c+1]();
   int *temp;
