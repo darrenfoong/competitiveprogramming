@@ -95,7 +95,7 @@ int dp(int n, int c, double maxValue, vi &values, vi &costs) {
 
   for (int i = 1; i < n; i++) {
     forv1(j,c) {
-      int pickedValue = (j >= costs[i] ? dpPrev[j - costs[i]] : 0) + values[i];
+      int pickedValue = j >= costs[i] ? dpPrev[j - costs[i]] + values[i] : INT_MIN;
       int unpickedValue = dpPrev[j];
 
       dpCurrent[j] = max(pickedValue, unpickedValue);
@@ -106,5 +106,5 @@ int dp(int n, int c, double maxValue, vi &values, vi &costs) {
     dpCurrent = temp;
   }
 
-  return dpCurrent[c];
+  return dpPrev[c];
 }
